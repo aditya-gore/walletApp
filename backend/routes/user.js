@@ -18,6 +18,128 @@ const signinBody = zod.object({
   username: zod.string().email(),
   password: zod.string(),
 });
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *   schemas:
+ *     Signup:
+ *       type: object
+ *       required:
+ *         - username
+ *         - firstName
+ *         - lastName
+ *         - password
+ *       properties:
+ *         username:
+ *           type: string
+ *           description: Email of the user
+ *         firstName:
+ *           type: string
+ *           description: The first name of the user
+ *         lastName:
+ *           type: string
+ *           description: The last name of the user
+ *         password:
+ *           type: string
+ *           description: The password of the user (stored after hashing)
+ *     Signin:
+ *       type: object
+ *       required:
+ *         - username
+ *         - password
+ *       properties:
+ *         username:
+ *           type: string
+ *           description: Email of the user
+ *         password:
+ *           type: string
+ *           description: The password of the user (stored after hashing)
+ *     Transfer:
+ *       type: object
+ *       required:
+ *         - to
+ *         - amount
+ *       properties:
+ *         to:
+ *           type: string
+ *           description: Id of the receiver
+ *         amount:
+ *           type: string
+ *           description: The amount that needs to be transferred
+ *     Balance:
+ *       type: object
+ *       required:
+ *         - balance
+ *       properties:
+ *         balance:
+ *           type: number
+ *           description: Current balance in the users account
+ *
+ * paths:
+ *   /api/v1/user/:
+ *     put:
+ *       security:
+ *         - bearerAuth: []
+ *   /api/v1/user/bulk:
+ *     get:
+ *       security:
+ *         - bearerAuth: []
+ *   /api/v1/account/balance:
+ *     get:
+ *       security:
+ *         - bearerAuth: []
+ *   /api/v1/account/transfer:
+ *     post:
+ *       security:
+ *         - bearerAuth: []
+ */
+/**
+ * @swagger
+ * tags:
+ *  name: Users
+ *  description: All the User related routes
+ */
+/**
+ * @swagger
+ * /api/v1/user/signup:
+ *   post:
+ *     summary: Allows a user to signup return token
+ *     tags: [Users]
+ *     requestBody:
+ *       description: Details of the user
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/Signup"
+ *     responses:
+ *       200:
+ *         description: Returns a jwt token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 token:
+ *                   type: string
+ *                   description: JWT
+ *       411:
+ *         description: Returns an error message
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
 router.post('/signup', async (req, res) => {
   try {
     const { success } = signupBody.safeParse(req.body);
@@ -52,6 +174,40 @@ router.post('/signup', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/v1/user/signin:
+ *   post:
+ *     summary: Allows a user to signup return token
+ *     tags: [Users]
+ *     requestBody:
+ *       description: Credentials of the user
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/Signin"
+ *     responses:
+ *       200:
+ *         description: Returns a jwt token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: JWT
+ *       411:
+ *         description: Returns an error message
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
 router.post('/signin', async (req, res) => {
   try {
     const { success } = signinBody.safeParse(req.body);
@@ -88,6 +244,31 @@ router.post('/signin', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/v1/user/:
+ *   put:
+ *     summary: Update a user
+ *     tags: [Users]
+ *     requestBody:
+ *       description: Credentials of the user
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/Signup"
+ *     responses:
+ *       200:
+ *         description: Returns a success message
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: status
+ */
 router.put('/', authMiddleware, async (req, res) => {
   let data = req.body;
   try {
@@ -106,6 +287,30 @@ router.put('/', authMiddleware, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/v1/user/bulk:
+ *   get:
+ *     summary: get users
+ *     tags: [Users]
+ *     parameters:
+ *       - in: query
+ *         name: filter
+ *         schema:
+ *           type: string
+ *           required: true
+ *           description: string to match user's first name or last name
+ *     responses:
+ *       200:
+ *         description: Returns a success message
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Signup'
+ *       404:
+ *         description: The User was not found
+ *
+ */
 router.get('/bulk', authMiddleware, async (req, res) => {
   const filter = req.query.filter || '';
   const users = await User.find(
@@ -123,4 +328,5 @@ router.get('/bulk', authMiddleware, async (req, res) => {
   );
   res.json({ user: users });
 });
+
 module.exports = router;
