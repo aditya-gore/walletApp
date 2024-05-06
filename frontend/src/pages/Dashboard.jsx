@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Appbar } from '../components/AppBar';
+import { Appbar } from '../components/Appbar';
 import { Balance } from '../components/Balance';
 import { Users } from '../components/Users';
 import axios from 'axios';
@@ -8,7 +8,7 @@ export const Dashboard = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:3000/api/v1/account/balance', {
+      .get('https://walletapp-m0wj.onrender.com/api/v1/account/balance', {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('token'),
         },
