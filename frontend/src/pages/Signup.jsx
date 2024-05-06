@@ -42,12 +42,15 @@ export const Signup = () => {
           <div className='pt-4'>
             <Button
               onClick={async () => {
-                await axios.post('http://localhost:3000/api/v1/user/signup', {
-                  username,
-                  firstName,
-                  lastName,
-                  password,
-                });
+                await axios.post(
+                  'https://walletapp-m0wj.onrender.com/api/v1/user/signup',
+                  {
+                    username,
+                    firstName,
+                    lastName,
+                    password,
+                  },
+                );
                 navigate('/signin');
               }}
               label={'Sign up'}
